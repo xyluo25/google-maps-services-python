@@ -20,6 +20,7 @@ Core client functionality, common across all API requests (including performing
 HTTP requests).
 """
 
+
 import base64
 import collections
 from datetime import datetime
@@ -40,10 +41,10 @@ except ImportError: # Python 2
     from urllib import urlencode
 
 _X_GOOG_MAPS_EXPERIENCE_ID = "X-Goog-Maps-Experience-ID"
-_USER_AGENT = "GoogleGeoApiClientPython/%s" % googlemaps.__version__
+_USER_AGENT = f"GoogleGeoApiClientPython/{googlemaps.__version__}"
 _DEFAULT_BASE_URL = "https://maps.googleapis.com"
 
-_RETRIABLE_STATUSES = set([500, 503, 504])
+_RETRIABLE_STATUSES = {500, 503, 504}
 
 
 class Client(object):
@@ -298,10 +299,7 @@ class Client(object):
                 time.sleep(1 - elapsed_since_earliest)
 
         try:
-            if extract_body:
-                result = extract_body(response)
-            else:
-                result = self._get_body(response)
+            result = extract_body(response) if extract_body else self._get_body(response)
             self.sent_times.append(time.time())
             return result
         except googlemaps.exceptions._RetriableRequest as e:
@@ -323,7 +321,7 @@ class Client(object):
         body = response.json()
 
         api_status = body["status"]
-        if api_status == "OK" or api_status == "ZERO_RESULTS":
+        if api_status in ["OK", "ZERO_RESULTS"]:
             return body
 
         if api_status == "OVER_QUERY_LIMIT":
@@ -361,11 +359,11 @@ class Client(object):
 
             path = "?".join([path, urlencode_params(params)])
             sig = sign_hmac(self.client_secret, path)
-            return path + "&signature=" + sig
+            return f"{path}&signature={sig}"
 
         if self.key:
             params.append(("key", self.key))
-            return path + "?" + urlencode_params(params)
+            return f"{path}?{urlencode_params(params)}"
 
         raise ValueError("Must provide API key for this API. It does not accept "
                          "enterprise credentials.")

@@ -309,7 +309,7 @@ class ClientTest(_test.TestCase):
         experience_id2 = "Exp2"
         client.set_experience_id(experience_id1, experience_id2)
 
-        result = "%s,%s" % (experience_id1, experience_id2)
+        result = f"{experience_id1},{experience_id2}"
         self.assertEqual(result, client.get_experience_id())
 
     def test_no_experience_id(self):
@@ -346,7 +346,7 @@ class ClientTest(_test.TestCase):
         ids = client.get_experience_id()
         # [END maps_experience_id]
 
-        result = "%s,%s" % (experience_id, other_experience_id)
+        result = f"{experience_id},{other_experience_id}"
         self.assertEqual(result, ids)
 
     @responses.activate

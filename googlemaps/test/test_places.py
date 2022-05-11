@@ -140,8 +140,10 @@ class PlacesTest(_test.TestCase):
 
         self.assertTrue(isinstance(response, GeneratorType))
         self.assertEqual(1, len(responses.calls))
-        self.assertURLEqual('%s?maxwidth=100&photoreference=%s&key=%s'
-                            % (url, ref, self.key), responses.calls[0].request.url)
+        self.assertURLEqual(
+            f'{url}?maxwidth=100&photoreference={ref}&key={self.key}',
+            responses.calls[0].request.url,
+        )
 
     @responses.activate
     def test_autocomplete(self):
@@ -176,5 +178,7 @@ class PlacesTest(_test.TestCase):
         self.client.places_autocomplete_query('pizza near New York')
 
         self.assertEqual(1, len(responses.calls))
-        self.assertURLEqual('%s?input=pizza+near+New+York&key=%s' %
-                            (url, self.key), responses.calls[0].request.url)
+        self.assertURLEqual(
+            f'{url}?input=pizza+near+New+York&key={self.key}',
+            responses.calls[0].request.url,
+        )

@@ -42,7 +42,7 @@ master_doc = 'index'
 # General information about the project.
 from datetime import datetime
 project = u'Python Client for Google Maps Services'
-copyright = u'%s, Google Inc.' % datetime.now().year
+copyright = f'{datetime.now().year}, Google Inc.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

@@ -29,7 +29,7 @@ class ApiError(Exception):
         if self.message is None:
             return str(self.status)
         else:
-            return "%s (%s)" % (self.status, self.message)
+            return f"{self.status} ({self.message})"
 
 class TransportError(Exception):
     """Something went wrong while trying to execute the request."""

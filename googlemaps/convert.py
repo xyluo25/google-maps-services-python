@@ -80,7 +80,7 @@ def latlng(arg):
         return arg
 
     normalized = normalize_lat_lng(arg)
-    return "%s,%s" % (format_float(normalized[0]), format_float(normalized[1]))
+    return f"{format_float(normalized[0])},{format_float(normalized[1])}"
 
 
 def normalize_lat_lng(arg):
@@ -151,9 +151,7 @@ def as_list(arg):
 
     :rtype: list
     """
-    if _is_list(arg):
-        return arg
-    return [arg]
+    return arg if _is_list(arg) else [arg]
 
 
 def _is_list(arg):
@@ -230,7 +228,7 @@ def components(arg):
     def expand(arg):
         for k, v in arg.items():
             for item in as_list(v):
-                yield "%s:%s" % (k, item)
+                yield f"{k}:{item}"
 
     if isinstance(arg, dict):
         return "|".join(sorted(expand(arg)))
@@ -272,8 +270,7 @@ def bounds(arg):
         return arg
     elif isinstance(arg, dict):
         if "southwest" in arg and "northeast" in arg:
-            return "%s|%s" % (latlng(arg["southwest"]),
-                              latlng(arg["northeast"]))
+            return f'{latlng(arg["southwest"])}|{latlng(arg["northeast"])}'
 
     raise TypeError(
         "Expected a bounds (southwest/northeast) dict, "
@@ -371,9 +368,6 @@ def shortest_path(locations):
     if isinstance(locations, tuple):
         # Handle the single-tuple lat/lng case.
         locations = [locations]
-    encoded = "enc:%s" % encode_polyline(locations)
+    encoded = f"enc:{encode_polyline(locations)}"
     unencoded = location_list(locations)
-    if len(encoded) < len(unencoded):
-        return encoded
-    else:
-        return unencoded
+    return encoded if len(encoded) < len(unencoded) else unencoded
