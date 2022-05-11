@@ -52,11 +52,7 @@ def elevation_along_path(client, path, samples):
     :rtype: list of elevation data responses
     """
 
-    if type(path) is str:
-        path = "enc:%s" % path
-    else:
-        path = convert.shortest_path(path)
-
+    path = f"enc:{path}" if type(path) is str else convert.shortest_path(path)
     params = {
         "path": path,
         "samples": samples

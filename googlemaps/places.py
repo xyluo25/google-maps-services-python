@@ -16,38 +16,38 @@
 #
 
 """Performs requests to the Google Places API."""
+
 import warnings
 
 from googlemaps import convert
 
 
-PLACES_FIND_FIELDS_BASIC = set(
-    [
-        "formatted_address",
-        "geometry",
-        "geometry/location",
-        "geometry/location/lat",
-        "geometry/location/lng",
-        "geometry/viewport",
-        "geometry/viewport/northeast",
-        "geometry/viewport/northeast/lat",
-        "geometry/viewport/northeast/lng",
-        "geometry/viewport/southwest",
-        "geometry/viewport/southwest/lat",
-        "geometry/viewport/southwest/lng",
-        "icon",
-        "name",
-        "permanently_closed",
-        "photos",
-        "place_id",
-        "plus_code",
-        "types",
-    ]
-)
+PLACES_FIND_FIELDS_BASIC = {
+    "formatted_address",
+    "geometry",
+    "geometry/location",
+    "geometry/location/lat",
+    "geometry/location/lng",
+    "geometry/viewport",
+    "geometry/viewport/northeast",
+    "geometry/viewport/northeast/lat",
+    "geometry/viewport/northeast/lng",
+    "geometry/viewport/southwest",
+    "geometry/viewport/southwest/lat",
+    "geometry/viewport/southwest/lng",
+    "icon",
+    "name",
+    "permanently_closed",
+    "photos",
+    "place_id",
+    "plus_code",
+    "types",
+}
 
-PLACES_FIND_FIELDS_CONTACT = set(["opening_hours"])
 
-PLACES_FIND_FIELDS_ATMOSPHERE = set(["price_level", "rating", "user_ratings_total"])
+PLACES_FIND_FIELDS_CONTACT = {"opening_hours"}
+
+PLACES_FIND_FIELDS_ATMOSPHERE = {"price_level", "rating", "user_ratings_total"}
 
 PLACES_FIND_FIELDS = (
     PLACES_FIND_FIELDS_BASIC
@@ -55,42 +55,49 @@ PLACES_FIND_FIELDS = (
     ^ PLACES_FIND_FIELDS_ATMOSPHERE
 )
 
-PLACES_DETAIL_FIELDS_BASIC = set(
-    [
-        "address_component",
-        "adr_address",
-        "formatted_address",
-        "geometry",
-        "geometry/location",
-        "geometry/location/lat",
-        "geometry/location/lng",
-        "geometry/viewport",
-        "geometry/viewport/northeast",
-        "geometry/viewport/northeast/lat",
-        "geometry/viewport/northeast/lng",
-        "geometry/viewport/southwest",
-        "geometry/viewport/southwest/lat",
-        "geometry/viewport/southwest/lng",
-        "icon",
-        "name",
-        "permanently_closed",
-        "photo",
-        "place_id",
-        "plus_code",
-        "type",
-        "url",
-        "utc_offset",
-        "vicinity",
-    ]
-)
+PLACES_DETAIL_FIELDS_BASIC = {
+    "address_component",
+    "adr_address",
+    "formatted_address",
+    "geometry",
+    "geometry/location",
+    "geometry/location/lat",
+    "geometry/location/lng",
+    "geometry/viewport",
+    "geometry/viewport/northeast",
+    "geometry/viewport/northeast/lat",
+    "geometry/viewport/northeast/lng",
+    "geometry/viewport/southwest",
+    "geometry/viewport/southwest/lat",
+    "geometry/viewport/southwest/lng",
+    "icon",
+    "name",
+    "permanently_closed",
+    "photo",
+    "place_id",
+    "plus_code",
+    "type",
+    "url",
+    "utc_offset",
+    "vicinity",
+}
 
-PLACES_DETAIL_FIELDS_CONTACT = set(
-    ["formatted_phone_number", "international_phone_number", "opening_hours", "website"]
-)
 
-PLACES_DETAIL_FIELDS_ATMOSPHERE = set(
-    ["price_level", "rating", "review", "user_ratings_total"]
-)
+PLACES_DETAIL_FIELDS_CONTACT = {
+    "formatted_phone_number",
+    "international_phone_number",
+    "opening_hours",
+    "website",
+}
+
+
+PLACES_DETAIL_FIELDS_ATMOSPHERE = {
+    "price_level",
+    "rating",
+    "review",
+    "user_ratings_total",
+}
+
 
 PLACES_DETAIL_FIELDS = (
     PLACES_DETAIL_FIELDS_BASIC
@@ -134,16 +141,15 @@ def find_place(
     """
     params = {"input": input, "inputtype": input_type}
 
-    if input_type != "textquery" and input_type != "phonenumber":
+    if input_type not in ["textquery", "phonenumber"]:
         raise ValueError(
             "Valid values for the `input_type` param for "
             "`find_place` are 'textquery' or 'phonenumber', "
             "the given value is invalid: '%s'" % input_type
         )
 
-    if fields:       
-        invalid_fields = set(fields) - PLACES_FIND_FIELDS
-        if invalid_fields:
+    if fields:   
+        if invalid_fields := set(fields) - PLACES_FIND_FIELDS:
             raise ValueError(
                 "Valid values for the `fields` param for "
                 "`find_place` are '%s', these given field(s) "
@@ -155,7 +161,7 @@ def find_place(
     if location_bias:
         valid = ["ipbias", "point", "circle", "rectangle"]
         if location_bias.split(":")[0] not in valid:
-            raise ValueError("location_bias should be prefixed with one of: %s" % valid)
+            raise ValueError(f"location_bias should be prefixed with one of: {valid}")
         params["locationbias"] = location_bias
     if language:
         params["language"] = language
@@ -389,7 +395,7 @@ def _places(
     if page_token:
         params["pagetoken"] = page_token
 
-    url = "/maps/api/place/%ssearch/json" % url_part
+    url = f"/maps/api/place/{url_part}search/json"
     return client._request(url, params)
 
 
@@ -420,8 +426,7 @@ def place(client, place_id, session_token=None, fields=None, language=None):
     params = {"placeid": place_id}
 
     if fields:
-        invalid_fields = set(fields) - PLACES_DETAIL_FIELDS
-        if invalid_fields:
+        if invalid_fields := set(fields) - PLACES_DETAIL_FIELDS:
             raise ValueError(
                 "Valid values for the `fields` param for "
                 "`place` are '%s', these given field(s) "
@@ -634,5 +639,5 @@ def _autocomplete(
     if strict_bounds:
         params["strictbounds"] = "true"
 
-    url = "/maps/api/place/%sautocomplete/json" % url_part
+    url = f"/maps/api/place/{url_part}autocomplete/json"
     return client._request(url, params).get("predictions", [])
